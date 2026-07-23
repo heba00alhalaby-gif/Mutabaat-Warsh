@@ -42,33 +42,8 @@ async function loadData() {
   setAttendance(attendanceData);
 }
   useEffect(() => {
-    async function loadData() {
-  // قراءة الطالبات
-  const studentsSnapshot = await getDocs(collection(db, "students"));
-
-  const studentsData = studentsSnapshot.docs
-    .sort((a, b) => a.id.localeCompare(b.id))
-    .map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-  setStudents(studentsData);
-
-  // قراءة الحضور
-  const attendanceSnapshot = await getDocs(collection(db, "attendance"));
-
-  const attendanceData = attendanceSnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
-
-  setAttendance(attendanceData);
-  console.log(attendanceData);
-}
-
-loadData();
-  }, []);
+  loadData();
+}, []);
 
   async function saveAttendance(studentId: string, status: string) {console.log(studentId, status);
   const attendanceRef = collection(db, "attendance");
@@ -172,60 +147,18 @@ attendance.forEach((item: any) => {
       <hr />
 
       {students.map((student) => (
-        <div
-          key={student.id}
-          style={{
-            border: "1px solid #ddd",
-            borderRadius: "10px",
-            padding: "15px",
-            margin: "10px 0",
-          }}
-        >
-          <h3>{student.name}</h3>
-<p
-  style={{
-    color: "#555",
-    marginTop: "5px",
-    marginBottom: "15px",
-    fontWeight: "bold",
-  }}
->
-  الحالة الحالية: {attendanceMap.get(student.id) ?? "لم تُسجل بعد"}
-</p>
-          <button
-  style={{
-    padding: "10px 18px",
-    fontSize: "16px",
-    cursor: "pointer",
-    backgroundColor: "#2e7d32",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-  }}
-  onClick={() => saveAttendance(student.id, "حضرت")}
->
-  حضرت
-</button>
-
-          <button
-  style={{
-    marginRight: "10px",
-    padding: "10px 18px",
-    fontSize: "16px",
-    cursor: "pointer",
-    backgroundColor: "#ef6c00",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-  }}
-  onClick={() =>
-    saveAttendance(student.id, "اعتذر عن الحضور")
-  }
->
-  اعتذرت عن الحضور
-</button>
-        </div>
-      ))}
+  <StudentCard
+    key={student.id}
+    name={student.name}
+    status={attendanceMap.get(student.id) ?? ""}
+    onPresent={() =>
+      saveAttendance(student.id, "حضرت")
+    }
+    onAbsent={() =>
+      saveAttendance(student.id, "اعتذر عن الحضور")
+    }
+  />
+))}
     </main>
   );
 }
